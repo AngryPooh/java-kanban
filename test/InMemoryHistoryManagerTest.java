@@ -4,61 +4,106 @@ import model.Epic;
 import model.Status;
 import model.Subtask;
 import model.Task;
-
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class InMemoryHistoryManagerTest {
 
     private final HistoryManager historyManager = Managers.getDefaultHistory();
 
-    protected Task task = new Task("Задача", "Продать пальто", 1, Status.NEW);
-    protected Task task1 = new Task("Задача", "Купить сапоги", 2, Status.NEW);
-    protected Epic epic = new Epic("Эпик", "Переезд",10, Status.NEW);
-    protected Subtask subtask = new Subtask("Подзадача", "собрать посуду", 1, Status.NEW, 10);
-    protected Subtask subtask1 = new Subtask("Подзадача", "заказать машину", 2, Status.NEW, 10);
+    Task task1 = new Task("Задача1", "Разобраться в теории спринта 6", Status.NEW);
+    Task task2 = new Task("Задача2", "Сдать TZ_6", Status.NEW);
+    Epic epic1 = new Epic("Epic1", "Продать зимнюю резину на дисках");
+    Subtask subtask1v1 = new Subtask("SubTask1_1", "Помыть резину, сделать фото", Status.NEW);
+    Subtask subtask1v2 = new Subtask("SubTask1_2", "Разместить объявление на Авито", Status.NEW);
+    Subtask subtask1v3 = new Subtask("SubTask1_3", "Разместить объявление на Авто.ру", Status.NEW);
 
 
     @Test
     public void add() {
-        historyManager.add(task);
-        historyManager.add(task1);
-        Assertions.assertEquals(List.of(task, task1), historyManager.getHistory());
+        task1.setId(1);
+        historyManager.add(task1);//1
+        task2.setId(2);
+        historyManager.add(task2);//2
+        assertEquals(List.of(task1, task2), historyManager.getHistory());
 
-        historyManager.add(epic);
-        assertEquals(List.of(task,task1,epic), historyManager.getHistory());
+        epic1.setId(3);
+        historyManager.add(epic1);
+        assertEquals(List.of(task1, task2, epic1), historyManager.getHistory());
 
-        historyManager.add(subtask);
-        historyManager.add(subtask1);
-        assertEquals(List.of(task,task1,epic,subtask,subtask1), historyManager.getHistory());
+        subtask1v1.setEpicId(3);
+        subtask1v1.setId(4);
+        subtask1v2.setEpicId(3);
+        subtask1v2.setId(5);
+        subtask1v3.setEpicId(3);
+        subtask1v3.setId(6);
+        historyManager.add(subtask1v1);
+        historyManager.add(subtask1v2);
+        historyManager.add(subtask1v3);
+        assertEquals(List.of(task1, task2, epic1, subtask1v1, subtask1v2, subtask1v3), historyManager.getHistory());
     }
 
     @Test
     public void getHistory() {
         List<Task> history = historyManager.getHistory();
-        Assertions.assertNotNull(history, "Список истории отсутствует");
+        assertNotNull(history, "Список истории отсутствует");
         assertTrue(history.isEmpty(), "История не пустая");
 
-        historyManager.add(task);
+        task1.setId(1);
         historyManager.add(task1);
+        task2.setId(2);
+        historyManager.add(task2);
+        epic1.setId(3);
+        historyManager.add(epic1);
+        historyManager.getHistory();
         history = historyManager.getHistory();
-        Assertions.assertEquals(2, history.size(), "История не сохранена");
+        assertEquals(3, history.size(), "История не сохранена");
+        assertEquals(1, task1.getId(), "История сохранена неверно");
+        assertEquals(2, task2.getId(), "История сохранена неверно");
+    }
 
-        historyManager.add(epic);
-        historyManager.getHistory();
-        Assertions.assertEquals(3, history.size(), "История сохранена неверно");
-        Assertions.assertEquals(1, task.getId(), "История сохранена неверно");
-        Assertions.assertEquals(2, task1.getId(), "История сохранена неверно");
+    @Test
+    public void doesNotAddDuplicates() {
 
-        historyManager.add(subtask);
-        historyManager.add(subtask1);
+        Task task1 = new Task("Задача 1", "Разобраться в теории спринта 6");
+        task1.setId(1);
+        historyManager.add(task1);
+
+        // Добавляем задачу несколько раз, чтобы она добавилась в историю
+        historyManager.add(task1);
+        historyManager.add(task1);
+        historyManager.add(task1);
+
+        List<Task> history = historyManager.getHistory();
+
+        // Проверяем, что задача только одна в истории
+        assertEquals(1, history.size(), "История должна содержать только одну запись для каждой задачи");
+        assertTrue(history.contains(task1), "История должна содержать задачу 1");
+    }
+
+    @Test
+    public void addingTaskToEndWhenAddAgain() {
+
+        task1.setId(1);
+        historyManager.add(task1);
+        task2.setId(2);
+        historyManager.add(task2);
+
         historyManager.getHistory();
-        Assertions.assertEquals(5, history.size(), "История сохранена неверно");
+
+        assertEquals(1, task1.getId(), "История сохранена неверно");
+        assertEquals(2, task2.getId(), "История сохранена неверно");
+
+        historyManager.add(task1);
+        historyManager.getHistory();
+
+        assertEquals(2, task2.getId(), "История сохранена неверно");
+        assertEquals(1, task1.getId(), "История сохранена неверно");
+
     }
 }
+
