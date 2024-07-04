@@ -22,6 +22,8 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
+/out/
+out/test/test
 /test/test.iml
 out/test/test/test.iml
 *.iml
@@ -29,3 +31,5 @@ out/test/test/test.iml
 # для macOS
 test/.DS_Store
 .DS_Store
+
+
