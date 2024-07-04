@@ -23,6 +23,7 @@
 hs_err_pid*
 
 /test/test.iml
+*.iml
 
 # для macOS
 .DS_Store
