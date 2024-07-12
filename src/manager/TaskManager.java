@@ -7,6 +7,7 @@ import model.Task;
 import java.util.List;
 
 public interface TaskManager {
+
     //создание Task
     void createTask(Task newTask);
 
@@ -67,5 +68,4 @@ public interface TaskManager {
     void checkEpicStatus(Epic epic);
 
     List<Task> getHistory();
-
 }
