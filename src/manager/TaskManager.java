@@ -8,13 +8,13 @@ import java.util.List;
 
 public interface TaskManager {
     //создание Task
-    Integer createTask(Task newTask);
+    void createTask(Task newTask);
 
     //создание Subtask
-    Integer createSubtask(Subtask newSubtask);
+    void createSubtask(Subtask newSubtask);
 
     //создание Epic
-    Integer createEpic(Epic newEpic);
+    void createEpic(Epic newEpic);
 
     // удаление всех задач Task
     void deleteAllTasks();
@@ -47,10 +47,10 @@ public interface TaskManager {
     List<Subtask> getListOfSubtasksByEpicId(int epicId);
 
     //Удаление по идентификатору Task
-    void deleteTaskById(Integer taskIdForDelete);
+    void deleteTaskById(int taskIdForDelete);
 
     //Удаление по идентификатору Subtask
-    void deleteSubtaskById(Integer subtaskIdForDelete);
+    void deleteSubtaskById(int subtaskIdForDelete);
 
     //Удаление по идентификатору Epic
     void deleteEpicById(int epicIdForDelete);
@@ -64,17 +64,7 @@ public interface TaskManager {
     void updateEpic(Epic updateEpic);
 
     // Управление статусами для Epic
-    void checkEpicStatus(int epicId);
-
-    // печать списка всех тасков
-    void printAllTasks();
-
-    // печать списка всех сабтасков
-    void printAllSubtasks();
-
-    // печать списка всех эпиков
-    void printAllEpics();
-
+    void checkEpicStatus(Epic epic);
 
     List<Task> getHistory();
 

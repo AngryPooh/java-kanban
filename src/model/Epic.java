@@ -13,9 +13,14 @@ public class Epic extends Task {
         super(title, description);
     }
 
+    public Epic(String title, String description, Status status) {
+        super(title, description, status);
+    }
+
     public Epic(String title, String description, int epicId) {
         super(title, description, epicId);
     }
+
     public Epic(String title, String description, int epicId, Status status) {
         super(title, description, epicId, status);
     }
@@ -25,17 +30,15 @@ public class Epic extends Task {
         this.subtaskIds = subtaskIds;
     }
 
-    public Epic(List<Integer> subtaskIds) {
-        super();
-        this.subtaskIds = subtaskIds;
-    }
 
     public List<Integer> getSubtaskIds() {
         return subtaskIds;
     }
+
     public TaskType getTaskType() {
         return TaskType.EPIC;
     }
+
     public void addSubtaskId(int subtaskId) {
         subtaskIds.add(subtaskId);
     }
@@ -76,6 +79,5 @@ public class Epic extends Task {
                     ", id подзадач(и)='" + subtaskIds + '}' + '\'';
         }
     }
-
 
 }
