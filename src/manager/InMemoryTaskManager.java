@@ -29,18 +29,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     //создание Task
     @Override
-    public void createTask(Task newTask) {
+    public Task createTask(Task newTask) {
         newTask.setId(getNextId());
         tasks.put(newTask.getId(), newTask);
+        return newTask;
     }
 
     //создание Subtask
     @Override
-    public void createSubtask(Subtask newSubtask) {
+    public Subtask createSubtask(Subtask newSubtask) {
         Epic epic = epics.get(newSubtask.getEpicId());
 
         if (epic == null) {
-            return;
+            return null;
         }
 
         newSubtask.setId(getNextId());
@@ -48,13 +49,15 @@ public class InMemoryTaskManager implements TaskManager {
         newSubtask.setEpicId(epic.getId());
         epic.addSubtaskId(newSubtask.getId());
         checkEpicStatus(epic);
+        return newSubtask;
     }
 
     //создание Epic
     @Override
-    public void createEpic(Epic newEpic) {
+    public Epic createEpic(Epic newEpic) {
         newEpic.setId(getNextId());
         epics.put(newEpic.getId(), newEpic);
+        return newEpic;
     }
 
     // удаление всех задач Task

@@ -9,13 +9,13 @@ import java.util.List;
 public interface TaskManager {
 
     //создание Task
-    void createTask(Task newTask);
+    Task createTask(Task newTask);
 
     //создание Subtask
-    void createSubtask(Subtask newSubtask);
+    Subtask createSubtask(Subtask newSubtask);
 
     //создание Epic
-    void createEpic(Epic newEpic);
+    Epic createEpic(Epic newEpic);
 
     // удаление всех задач Task
     void deleteAllTasks();
