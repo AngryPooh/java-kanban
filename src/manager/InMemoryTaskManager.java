@@ -36,11 +36,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     //создание Subtask
     @Override
-    public void createSubtask(Subtask newSubtask) {
+
+    public Subtask createSubtask(Subtask newSubtask) {
         Epic epic = epics.get(newSubtask.getEpicId());
 
         if (epic == null) {
-            return;
+            return null;
         }
 
         newSubtask.setId(getNextId());
@@ -55,7 +56,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void createEpic(Epic newEpic) {
         newEpic.setId(getNextId());
         epics.put(newEpic.getId(), newEpic);
-    }
+}
 
     // удаление всех задач Task
     @Override
