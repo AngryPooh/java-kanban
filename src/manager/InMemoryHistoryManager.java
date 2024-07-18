@@ -63,6 +63,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (task == null) {
             return;
         }
+
         removeNode(task.getId());
         linkLast(task);
         historyMap.put(task.getId(), tail);

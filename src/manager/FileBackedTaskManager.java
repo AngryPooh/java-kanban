@@ -9,47 +9,50 @@ import java.util.List;
 import static java.lang.String.format;
 
 
-public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
-    File file;
-    String tabular = "id,type,name,status,description,epic\n";
+public class FileBackedTaskManager extends InMemoryTaskManager {
+    protected File file;
+    protected final String tabular = "id,type,name,status,description,epic\n";
 
     public FileBackedTaskManager(File file) {
         this.file = file;
     }
 
-    //метод сохраняет текущее состояние менеджера в указанный файл
 
     public static FileBackedTaskManager loadFromFile(File file) {
 
-        try {
-            FileBackedTaskManager fbtm = new FileBackedTaskManager(file);
-            FileReader fr = new FileReader(file);
-            BufferedReader reader = new BufferedReader(fr);
+        int countId = 0;
+
+        FileBackedTaskManager fbtm = new FileBackedTaskManager(file);
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
 
             reader.readLine();
 
             while (reader.ready()) {
                 String taskString = reader.readLine();
                 Task task = fromString(taskString);
-                if (task.getTaskType().equals(TaskType.TASK)) {
-                    fbtm.tasks.put(task.getId(), task);
-                } else if (task.getTaskType().equals(TaskType.EPIC)) {
-                    fbtm.epics.put(task.getId(), (Epic) task);
-                } else {
-                    Subtask subtask = (Subtask) task;
-                    fbtm.subtasks.put(task.getId(), subtask);
-                    Epic epic = fbtm.epics.get(subtask.getEpicId());
-                    epic.addSubtaskId(subtask.getId());
+
+                if (task.getId() > countId) {
+                    fbtm.setGeneratorId(task.getId());
+                }
+                TaskType taskType = task.getTaskType();
+                switch (taskType) {
+                    case TASK -> fbtm.tasks.put(task.getId(), task);
+                    case EPIC -> fbtm.epics.put(task.getId(), (Epic) task);
+                    default -> {
+                        Subtask subtask = (Subtask) task;
+                        fbtm.subtasks.put(task.getId(), subtask);
+                        Epic epic = fbtm.epics.get(subtask.getEpicId());
+                        epic.addSubtaskId(subtask.getId());
+                    }
                 }
             }
-            reader.close();
-            return fbtm;
-        } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка при выгрузке из файла: " + e.getMessage());
-        }
-    }
 
-    //метод восстанавливает данные менеджера из файла при запуске программы.
+        } catch (IOException e) {
+            throw new ManagerSaveException("Ошибка при выгрузке из файла: ", e);
+        }
+        return fbtm;
+    }
 
     public static String taskToString(Task task) {
 
@@ -62,8 +65,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         }
         return taskString;
     }
-
-    //метод сохранения задач в строку
 
     public static Task fromString(String taskString) throws IOException {
         String[] divide = taskString.split(",");
@@ -98,41 +99,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     }
 
-    //метод создания задачи из строки
-
-    public static void main(String[] args) {
-
-        File file = new File("tasks.cvs");
-        FileBackedTaskManager fbtm = new FileBackedTaskManager(file);
-
-        // Создание 2-х задач
-        Task task1 = new Task("Задача1", "Создаем задачу1");
-        Task task2 = new Task("Задача2", "Создаем задачу2");
-        fbtm.createTask(task1);//1
-        fbtm.createTask(task2);//2
-
-        // Создание эпиков
-        Epic epic1 = new Epic("Эпик1", "Создаем эпик1");
-        Epic epic2 = new Epic("Эпик2", "Создаем эпик2");
-        fbtm.createEpic(epic1);//3
-        fbtm.createEpic(epic2);//4
-
-        // Создание подзадач
-        Subtask subtask1p1 = new Subtask("Подзадача1", "Создаем подзадачу1", epic2.getId());
-        Subtask subtask1p2 = new Subtask("Подзадача2", "Создаем подзадачу2", epic2.getId());
-        Subtask subtask1p3 = new Subtask("Подзадача3", "Создаем подзадачу3", epic2.getId());
-        fbtm.createSubtask(subtask1p1);//5
-        fbtm.createSubtask(subtask1p2);//6
-        fbtm.createSubtask(subtask1p3);//7
-
-
-        FileBackedTaskManager file1 = FileBackedTaskManager.loadFromFile(file);
-        System.out.println(file1.getListOfTasks());
-        System.out.println(file1.getListOfEpics());
-        System.out.println(file1.getListOfSubtasks());
-
-    }
-
     public void save() {
 
         try (Writer writer = new BufferedWriter(new FileWriter(file))) {
@@ -151,7 +117,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 writer.write(subtaskFile);
             }
         } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка записи в файл " + e.getMessage());
+            throw new ManagerSaveException("Ошибка записи в файл ", e);
         }
     }
 
@@ -251,4 +217,5 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     public List<Subtask> getListOfSubtasksByEpicId(int epicId) {
         return super.getListOfSubtasksByEpicId(epicId);
     }
+
 }

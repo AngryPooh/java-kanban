@@ -6,7 +6,9 @@ import model.Task;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -17,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class FileBackedTaskManagerTest {
     private FileBackedTaskManager flt;
-    File file;
+    protected File file;
 
     @DisplayName("Тест проверяет создание файла")
     @Test
@@ -46,17 +48,29 @@ public class FileBackedTaskManagerTest {
         flt.createTask(task);
         flt.createEpic(epic);
         flt.createSubtask(subtask);
-        assertNotNull(flt, "Файл пуст");
+        assertEquals(1, flt.getListOfTasks().size(), "Количество задач не соответствует ожидаемому");
+        assertEquals(1, flt.getListOfEpics().size(), "Количество эпиков не соответствует ожидаемому");
+        assertEquals(1, flt.getListOfSubtasks().size(), "Количество подзадач не соответствует ожидаемому");
+
+        int noOfLines = 0;
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            while (reader.readLine() != null) {
+                noOfLines++;
+            }
+        }
+        assertEquals(4, noOfLines);
 
         tasks.add(flt.getTaskById(1));
         tasks.add(flt.getEpicById(2));
         tasks.add(flt.getSubtaskById(3));
 
-        assertNotNull(tasks, "Список задач пустой");
+        assertEquals(3, tasks.size(), "Список задач пустой");
 
         FileBackedTaskManager flt1 = FileBackedTaskManager.loadFromFile(file);
         List<Task> tasks2 = new ArrayList<>();
-        assertNotNull(flt1, "Список не должен быть  пустым");
+        assertEquals(1, flt1.getListOfTasks().size(), "Количество задач не соответствует ожидаемому");
+        assertEquals(1, flt1.getListOfEpics().size(), "Количество эпиков не соответствует ожидаемому");
+        assertEquals(1, flt1.getListOfSubtasks().size(), "Количество подзадач не соответствует ожидаемому");
 
         tasks2.add(flt1.getTaskById(1));
         tasks2.add(flt1.getEpicById(2));
