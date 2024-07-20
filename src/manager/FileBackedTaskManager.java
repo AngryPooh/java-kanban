@@ -4,7 +4,7 @@ import expention.ManagerSaveException;
 import model.*;
 
 import java.io.*;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -23,37 +23,42 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         FileBackedTaskManager fbtm = new FileBackedTaskManager(file);
 
+        List<String> lines = new ArrayList<>();
+
+        int countId = 0;
+
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
 
             reader.readLine();
 
             while (reader.ready()) {
                 String taskString = reader.readLine();
-                Task task = fromString(taskString);
-
-                List<Integer> iList = List.of(task.getId());
-                int countId = Collections.max(iList);
-
-                if (task.getId() > countId) {
-                    fbtm.setGeneratorId(task.getId());
-                }
-
-                TaskType taskType = task.getTaskType();
-                switch (taskType) {
-                    case TASK -> fbtm.tasks.put(task.getId(), task);
-                    case EPIC -> fbtm.epics.put(task.getId(), (Epic) task);
-                    default -> {
-                        Subtask subtask = (Subtask) task;
-                        fbtm.subtasks.put(task.getId(), subtask);
-                        Epic epic = fbtm.epics.get(subtask.getEpicId());
-                        epic.addSubtaskId(subtask.getId());
-                    }
-                }
+                lines.add(taskString);
             }
-
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при выгрузке из файла: ", e);
         }
+
+        for (String line : lines) {
+            Task task = fromString(line);
+            TaskType taskType = task.getTaskType();
+
+            switch (taskType) {
+                case TASK -> fbtm.tasks.put(task.getId(), task);
+                case EPIC -> fbtm.epics.put(task.getId(), (Epic) task);
+                default -> {
+                    Subtask subtask = (Subtask) task;
+                    fbtm.subtasks.put(task.getId(), subtask);
+                    Epic epic = fbtm.epics.get(subtask.getEpicId());
+                    epic.addSubtaskId(subtask.getId());
+                }
+            }
+
+            if (task.getId() > countId) {
+                countId = task.getId();
+            }
+        }
+        fbtm.generatorId = countId;
         return fbtm;
     }
 
@@ -69,7 +74,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return taskString;
     }
 
-    public static Task fromString(String taskString) throws IOException {
+    public static Task fromString(String taskString) {
         String[] divide = taskString.split(",");
 
         int id = Integer.parseInt(divide[0]);
@@ -99,7 +104,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 return subtask;
             }
         }
-
     }
 
     public void save() {
