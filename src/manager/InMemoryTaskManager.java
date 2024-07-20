@@ -27,7 +27,7 @@ public class InMemoryTaskManager implements TaskManager {
         return ++generatorId;
     }
 
-    public void setGeneratorId(int generatorId) {
+    protected void setGeneratorId(int generatorId) {
         this.generatorId = generatorId;
     }
 

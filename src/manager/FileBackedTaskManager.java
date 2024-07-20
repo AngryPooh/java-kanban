@@ -4,6 +4,7 @@ import expention.ManagerSaveException;
 import model.*;
 
 import java.io.*;
+import java.util.Collections;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -20,8 +21,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public static FileBackedTaskManager loadFromFile(File file) {
 
-        int countId = 0;
-
         FileBackedTaskManager fbtm = new FileBackedTaskManager(file);
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -32,9 +31,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 String taskString = reader.readLine();
                 Task task = fromString(taskString);
 
+                List<Integer> iList = List.of(task.getId());
+                int countId = Collections.max(iList);
+
                 if (task.getId() > countId) {
                     fbtm.setGeneratorId(task.getId());
                 }
+
                 TaskType taskType = task.getTaskType();
                 switch (taskType) {
                     case TASK -> fbtm.tasks.put(task.getId(), task);
