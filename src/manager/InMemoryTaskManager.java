@@ -27,6 +27,10 @@ public class InMemoryTaskManager implements TaskManager {
         return ++generatorId;
     }
 
+    protected void setGeneratorId(int generatorId) {
+        this.generatorId = generatorId;
+    }
+
     //создание Task
     @Override
     public Task createTask(Task newTask) {

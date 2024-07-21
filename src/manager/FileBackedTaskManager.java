@@ -4,7 +4,7 @@ import expention.ManagerSaveException;
 import model.*;
 
 import java.io.*;
-import java.util.ArrayList;
+import java.nio.file.Files;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -23,7 +23,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         FileBackedTaskManager fbtm = new FileBackedTaskManager(file);
 
-        List<String> lines = new ArrayList<>();
+        List<String> lines;
 
         int countId = 0;
 
@@ -31,34 +31,30 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
             reader.readLine();
 
-            while (reader.ready()) {
-                String taskString = reader.readLine();
-                lines.add(taskString);
+            lines = Files.readAllLines(file.toPath());
+
+            for (int i = 1; i < lines.size(); i++) {
+                Task task = fromString(lines.get(i));
+                int taskId = task.getId();
+                countId = Math.max(countId, taskId);
+
+                TaskType taskType = task.getTaskType();
+
+                switch (taskType) {
+                    case TASK -> fbtm.tasks.put(task.getId(), task);
+                    case EPIC -> fbtm.epics.put(task.getId(), (Epic) task);
+                    default -> {
+                        Subtask subtask = (Subtask) task;
+                        fbtm.subtasks.put(task.getId(), subtask);
+                        Epic epic = fbtm.epics.get(subtask.getEpicId());
+                        epic.addSubtaskId(subtask.getId());
+                    }
+                }
             }
+            fbtm.setGeneratorId(countId);
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при выгрузке из файла: ", e);
         }
-
-        for (String line : lines) {
-            Task task = fromString(line);
-            TaskType taskType = task.getTaskType();
-
-            switch (taskType) {
-                case TASK -> fbtm.tasks.put(task.getId(), task);
-                case EPIC -> fbtm.epics.put(task.getId(), (Epic) task);
-                default -> {
-                    Subtask subtask = (Subtask) task;
-                    fbtm.subtasks.put(task.getId(), subtask);
-                    Epic epic = fbtm.epics.get(subtask.getEpicId());
-                    epic.addSubtaskId(subtask.getId());
-                }
-            }
-
-            if (task.getId() > countId) {
-                countId = task.getId();
-            }
-        }
-        fbtm.generatorId = countId;
         return fbtm;
     }
 
