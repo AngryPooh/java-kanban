@@ -37,9 +37,6 @@ public class Task {
         this.id = taskId;
     }
 
-    public Task() {
-    }
-
     public int getId() {
         return id;
     }

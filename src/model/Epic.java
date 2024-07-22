@@ -30,10 +30,6 @@ public class Epic extends Task {
         this.subtaskIds = subtaskIds;
     }
 
-    public Epic(List<Integer> subtaskIds) {
-        super();
-        this.subtaskIds = subtaskIds;
-    }
 
     public List<Integer> getSubtaskIds() {
         return subtaskIds;

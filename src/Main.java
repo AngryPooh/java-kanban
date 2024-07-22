@@ -14,21 +14,21 @@ public class Main {
         TaskManager taskManager = new InMemoryTaskManager();
 
         // Создание 2-х задач
-        Task task1 = new Task("Задача 1", "Создаем задачу 1");
-        Task task2 = new Task("Задача 2", "Создаем задачу 2");
+        Task task1 = new Task("Задача 1", "Создаем задачу1");
+        Task task2 = new Task("Задача 2", "Создаем задачу2");
         taskManager.createTask(task1);//1
         taskManager.createTask(task2);//2
 
         // Создание эпиков
-        Epic epic1 = new Epic("Эпик 1", "Создаем эпик 1");
-        Epic epic2 = new Epic("Эпик 2", "Создаем эпик 2");
+        Epic epic1 = new Epic("Эпик 1", "Создаем эпик1");
+        Epic epic2 = new Epic("Эпик 2", "Создаем эпик2");
         taskManager.createEpic(epic1);//3
         taskManager.createEpic(epic2);//4
 
         // Создание подзадач
-        Subtask subtask1p1 = new Subtask("Подзадача 1", "Создаем подзадачу 1", epic1.getId());
-        Subtask subtask1p2 = new Subtask("Подзадача 2", "Создаем подзадачу 2", epic1.getId());
-        Subtask subtask1p3 = new Subtask("Подзадача 3", "Создаем подзадачу 3", epic1.getId());
+        Subtask subtask1p1 = new Subtask("Подзадача1", "Создаем подзадачу1", epic1.getId());
+        Subtask subtask1p2 = new Subtask("Подзадача2", "Создаем подзадачу2", epic1.getId());
+        Subtask subtask1p3 = new Subtask("Подзадача3", "Создаем подзадачу3", epic1.getId());
         taskManager.createSubtask(subtask1p1);//5
         taskManager.createSubtask(subtask1p2);//6
         taskManager.createSubtask(subtask1p3);//7
@@ -82,6 +82,7 @@ public class Main {
         System.out.println("Все задачи: " + taskManager.getListOfTasks());
         System.out.println("Все эпики: " + taskManager.getListOfEpics());
         System.out.println("Все подзадачи: " + taskManager.getListOfSubtasks());
+
     }
 
     private static void printHistory(List<Task> history) {
@@ -91,4 +92,5 @@ public class Main {
         }
         System.out.println();
     }
+
 }
