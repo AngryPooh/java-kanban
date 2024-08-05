@@ -33,7 +33,8 @@ public class Task {
         this.description = description;
     }
 
-    public Task() {
+    public Task(int taskId) {
+        this.id = taskId;
     }
 
     public int getId() {
@@ -52,12 +53,20 @@ public class Task {
         return description;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public TaskType getTaskType() {
